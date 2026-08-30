@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPPG Dashboard - Auto Template Gizi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            /* Tema Hari Gizi: Hijau Zamrud Elegan & Emas Hangat */
+            --primary: #166534; /* Emerald 800 */
+            --primary-hover: #14532d;
+            --accent: #d97706; /* Amber 600 */
+            --bg-color: #f8faf9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success-bg: #dcfce7;
+            --success-text: #15803d;
+            --warning-bg: #fef3c7;
+            --warning-text: #b45309;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #f0fdf4 0%, #f8faf9 100%);
+            color: var(--text-main); 
+            line-height: 1.5; 
+            padding: 2rem; 
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        .header { margin-bottom: 2.5rem; text-align: center; }
+        .header h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .header p { color: var(--text-muted); font-size: 1.05rem; }
+
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        @media (max-width: 992px) { .grid-layout { grid-template-columns: 1fr; } }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: var(--radius-lg); 
+            padding: 1.75rem; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.01); 
+            border: 1px solid rgba(226, 232, 240, 0.8); 
+            margin-bottom: 1.5rem; 
+            position: relative;
+        }
+
+        .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid #f1f5f9; color: var(--primary); }
+
+        .paste-group { margin-bottom: 1.5rem; }
+        .paste-group label { display: block; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
+        .paste-zone { width: 100%; min-height: 110px; border: 2px dashed #a7f3d0; border-radius: var(--radius-md); background-color: #f0fdf4; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 500; cursor: pointer; transition: all 0.3s ease; overflow: auto; padding: 1rem; }
+        .paste-zone:hover { background-color: #ecfdf5; border-color: var(--primary); }
+        .paste-zone:focus { outline: none; box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.15); border-color: var(--primary); }
+        .paste-placeholder { pointer-events: none; text-align: center; opacity: 0.8; }
+
+        .excel-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+        .excel-table th, .excel-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; white-space: nowrap; }
+        .excel-table th { background-color: #f8fafc; font-weight: 600; text-align: center; color: var(--text-main); }
+        .excel-table tr.total-row { font-weight: 700; background-color: #fefce8; color: var(--accent); }
+
+        /* TAB MENU STYLING */
+        .tabs-container { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: #f1f5f9; padding: 0.4rem; border-radius: 50px; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 0.6rem 1rem; border: none; background: transparent; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); border-radius: 50px; transition: all 0.3s; white-space: nowrap; text-align: center; }
+        .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .price-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; max-height: 450px; overflow-y: auto; padding-right: 5px; }
+        .price-list::-webkit-scrollbar { width: 6px; }
+        .price-list::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        
+        .price-item { display: flex; flex-direction: column; background: #f8faf9; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); transition: transform 0.2s; }
+        .price-item:hover { border-color: #cbd5e1; background: #ffffff; }
+        .price-row { display: flex; align-items: center; justify-content: space-between; }
+        .price-row span { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
+        .price-row input { width: 140px; padding: 0.6rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 0.95rem; text-align: right; font-weight: 600; color: var(--text-main); transition: all 0.2s; }
+        .price-row input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.1); }
+        .price-row input:disabled { background-color: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; }
+        
+        .sync-row { display: flex; align-items: center; gap: 15px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 0.85rem; }
+        .sync-row label { display: flex; align-items: center; cursor: pointer; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+        .sync-row label:hover { color: var(--primary); }
+        .sync-row input[type="checkbox"] { margin-right: 6px; cursor: pointer; accent-color: var(--primary); width: 14px; height: 14px; }
+
+        /* FITUR TOTAL HARGA */
+        .total-banner { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-weight: 600; font-size: 1.05rem; transition: all 0.3s ease; border: 2px solid transparent; }
+        .total-banner.neutral { background: #f1f5f9; color: var(--text-main); }
+        .total-banner.warning { background: var(--warning-bg); color: var(--warning-text); border-color: #fde68a; }
+        .total-banner.success { background: var(--success-bg); color: var(--success-text); border-color: #86efac; box-shadow: 0 4px 12px rgba(21, 128, 61, 0.1); }
+        .total-value { font-size: 1.25rem; font-weight: 800; }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: 700; border: none; border-radius: var(--radius-md); cursor: pointer; transition: all 0.3s; width: 100%; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(22, 101, 52, 0.2); }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(22, 101, 52, 0.3); }
+        .btn-secondary { background-color: #f1f5f9; color: var(--text-main); margin-top: 1rem; }
+        .btn-secondary:hover { background-color: #e2e8f0; }
+
+        #output-area { width: 100%; height: 500px; padding: 1.25rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); background-color: #fafafa; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; resize: vertical; line-height: 1.6; }
+        #output-area:focus { outline: none; border-color: var(--primary); }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { min-width: 250px; padding: 1rem 1.25rem; border-radius: var(--radius-md); color: white; font-size: 0.95rem; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background-color: #10b981; }
+        .toast.warning { background-color: #f59e0b; color: #fff; }
+        .toast.error { background-color: #ef4444; }
+        
+        .empty-state { text-align: center; color: var(--text-muted); font-size: 0.95rem; padding: 2rem 1rem; font-style: italic; background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed var(--border); }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🍃 SPPG Dashboard Gizi</h1>
+            <p>Sistem Pembuatan Template Laporan Harga & Nilai Gizi Harian</p>
+        </div>
+
+        <div class="grid-layout">
+            <div class="card">
+                <div class="card-title">1. Impor Data Excel</div>
+                <div class="paste-group">
+                    <label>Porsi Besar (Acuan Utama)</label>
+                    <div id="zone-besar" class="paste-zone" tabindex="0" onpaste="handlePaste(event, 'besar', 'Porsi Besar')">
+                        <div class="paste-placeholder">🖱️ Klik di sini, lalu tekan <b>Ctrl + V</b> (Paste)</div>
+                    </div>
+                </div>
+                <div class="paste-group">
+                    <label>Porsi Kecil</label>
+                    <div id="zone-kecil" class="paste-zone" tabindex="0" onpaste="handlePaste(event, 'kecil', 'Porsi Kecil')">
+                        <div class="paste-placeholder">🖱️ Klik di sini, lalu tekan <b>Ctrl + V</b> (Paste)</div>
+                    </div>
+                </div>
+                <div class="paste-group">
+                    <label>Porsi Bumil & Busui</label>
+                    <div id="zone-bumil" class="paste-zone" tabindex="0" onpaste="handlePaste(event, 'bumil', 'Porsi Bumil & Busui')">
+                        <div class="paste-placeholder">🖱️ Klik di sini, lalu tekan <b>Ctrl + V</b> (Paste)</div>
+                    </div>
+                </div>
+                <div class="paste-group">
+                    <label>Porsi Balita</label>
+                    <div id="zone-balita" class="paste-zone" tabindex="0" onpaste="handlePaste(event, 'balita', 'Porsi Balita')">
+                        <div class="paste-placeholder">🖱️ Klik di sini, lalu tekan <b>Ctrl + V</b> (Paste)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <div class="card-title">2. Manajemen Harga Menu</div>
+                    
+                    <div class="tabs-container" id="menu-tabs">
+                        <button class="tab-btn active" onclick="switchTab('besar')" id="tab-besar">Porsi Besar</button>
+                        <button class="tab-btn" onclick="switchTab('kecil')" id="tab-kecil">Kecil</button>
+                        <button class="tab-btn" onclick="switchTab('bumil')" id="tab-bumil">Bumil & Busui</button>
+                        <button class="tab-btn" onclick="switchTab('balita')" id="tab-balita">Balita</button>
+                    </div>
+
+                    <div id="total-banner" class="total-banner neutral">
+                        <span>Total Anggaran:</span>
+                        <span class="total-value" id="total-text">Rp 0 / Rp 10.000</span>
+                    </div>
+
+                    <div id="price-container" class="price-list">
+                        <div class="empty-state">Belum ada data.<br>Silakan impor tabel Porsi Besar di sebelah kiri.</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateTemplate()">✨ Buat Template Teks</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">3. Hasil Template (Siap Salin)</div>
+                    <textarea id="output-area" readonly placeholder="Hasil template akan muncul di sini..."></textarea>
+                    <button class="btn btn-secondary" onclick="copyToClipboard()">📋 Salin ke Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'besar';
+        let parsedData = { besar: null, kecil: null, bumil: null, balita: null };
+        let priceData = { besar: {}, kecil: {}, bumil: {}, balita: {} };
+        let syncState = {}; 
+        
+        // Target Harga per Kategori
+        const targetPrices = { besar: 10000, kecil: 8000, bumil: 10000, balita: 8000 };
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- SISTEM TAB & TOTAL HARGA ---
+        function switchTab(tabKey) {
+            currentTab = tabKey;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabKey}`).classList.add('active');
+            
+            renderMenuInputs();
+            updateTotalUI();
+        }
+
+        function updateTotalUI() {
+            const target = targetPrices[currentTab];
+            let sum = 0;
+            
+            if (parsedData[currentTab] && parsedData[currentTab].menu) {
+                parsedData[currentTab].menu.forEach(menuItem => {
+                    const price = parseInt(priceData[currentTab][menuItem]) || 0;
+                    sum += price;
+                });
+            }
+
+            const banner = document.getElementById('total-banner');
+            const textEl = document.getElementById('total-text');
+            
+            textEl.innerHTML = `Rp ${sum.toLocaleString('id-ID')} <span style="font-size: 0.9rem; font-weight: 500; color: inherit; opacity: 0.8;">/ Rp ${target.toLocaleString('id-ID')}</span>`;
+
+            banner.className = 'total-banner'; 
+            if (sum === 0) {
+                banner.classList.add('neutral');
+            } else if (sum === target) {
+                banner.classList.add('success');
+            } else {
+                banner.classList.add('warning');
+            }
+        }
+
+        // --- PASTE HANDLER ---
+        function handlePaste(event, key, labelName) {
+            event.preventDefault();
+            const clipboardData = (event.clipboardData || window.clipboardData).getData('text');
+            if (!clipboardData.trim()) return;
+
+            let cleanText = clipboardData.replace(/"([^"]+)"/g, function(match, p1) {
+                return p1.replace(/[\n\r]+/g, ' ').trim();
+            });
+
+            const rows = cleanText.trim().split('\n').map(row => row.split('\t').map(col => col.trim()));
+            processAndRender(key, rows, labelName);
+        }
+
+        function processAndRender(key, rows, labelName) {
+            let menu = [];
+            let tbodyHTML = '';
+            let totals = { energi: 0, protein: 0, lemak: 0, karbohidrat: 0, serat: 0 };
+            let totalFound = false;
+
+            for (let i = 0; i < rows.length; i++) {
+                let cols = rows[i];
+                if (cols.length === 0) continue;
+
+                let firstCol = cols[0].toLowerCase().trim();
+                let rawFirstCol = cols[0].trim();
+
+                if (firstCol === 'menu' || firstCol === '' || firstCol.includes('gizi') || firstCol.includes('berat')) continue; 
+
+                if (firstCol.includes('total')) {
+                    let nums = cols.map(c => parseFloat(c.replace(',', '.'))).filter(n => !isNaN(n));
+                    if (nums.length >= 5) {
+                        let last5 = nums.slice(-5);
+                        totals.energi = Math.round(last5[0]);
+                        totals.protein = Math.round(last5[1]);
+                        totals.lemak = Math.round(last5[2]);
+                        totals.karbohidrat = Math.round(last5[3]);
+                        totals.serat = Math.round(last5[4]);
+                        totalFound = true;
+                        
+                        tbodyHTML += `<tr class="total-row">
+                            <td colspan="2" style="text-align:center;">Total</td>
+                            <td>${last5[0]}</td><td>${last5[1]}</td><td>${last5[2]}</td><td>${last5[3]}</td><td>${last5[4]}</td>
+                        </tr>`;
+                    }
+                } 
+                else if (firstCol.includes('kebutuhan') || firstCol.includes('presentase')) {
+                    tbodyHTML += `<tr class="info-row">
+                        <td colspan="2" style="text-align:center;">${rawFirstCol}</td>
+                        <td>${cols[cols.length-5]||''}</td>
+                        <td>${cols[cols.length-4]||''}</td>
+                        <td>${cols[cols.length-3]||''}</td>
+                        <td>${cols[cols.length-2]||''}</td>
+                        <td>${cols[cols.length-1]||''}</td>
+                    </tr>`;
+                } 
+                else {
+                    menu.push(rawFirstCol);
+                    tbodyHTML += `<tr>
+                        <td style="text-align:left;">${rawFirstCol}</td>
+                        <td>${cols[1]||''}</td>
+                        <td>${cols[2]||''}</td>
+                        <td>${cols[3]||''}</td>
+                        <td>${cols[4]||''}</td>
+                        <td>${cols[5]||''}</td>
+                        <td>${cols[6]||''}</td>
+                    </tr>`;
+                }
+            }
+
+            const zone = document.getElementById(`zone-${key}`);
+            zone.style.padding = "0";
+            zone.style.border = "1px solid var(--border)";
+            
+            zone.innerHTML = `
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="text-align:left; background-color: #f1f5f9;">Menu</th>
+                            <th rowspan="2" style="background-color: #f1f5f9;">Berat<br>(g)</th>
+                            <th colspan="5" style="text-align:center; background-color: #f1f5f9;">Nilai Gizi</th>
+                        </tr>
+                        <tr>
+                            <th style="background-color: #f1f5f9;">Energi</th>
+                            <th style="background-color: #f1f5f9;">Protein</th>
+                            <th style="background-color: #f1f5f9;">Lemak</th>
+                            <th style="background-color: #f1f5f9;">Karbo</th>
+                            <th style="background-color: #f1f5f9;">Serat</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tbodyHTML}</tbody>
+                </table>
+            `;
+
+            parsedData[key] = { menu: [...new Set(menu)], totals: totals };
+            switchTab(key);
+
+            if (totalFound) showToast(`Data ${labelName} berhasil diimpor!`, 'success');
+            else showToast(`Gagal membaca "Total" pada ${labelName}.`, 'warning');
+        }
+
+        // --- RENDER MENU & SYNC LOGIC ---
+        function renderMenuInputs() {
+            const container = document.getElementById('price-container');
+            
+            if (!parsedData[currentTab] || !parsedData[currentTab].menu.length) {
+                let tabName = document.getElementById(`tab-${currentTab}`).textContent;
+                container.innerHTML = `<div class="empty-state">Belum ada data menu.<br>Silakan impor tabel Excel untuk <b>${tabName}</b>.</div>`;
+                return;
+            }
+            
+            container.innerHTML = ''; 
+            const currentMenus = parsedData[currentTab].menu;
+
+            currentMenus.forEach(menuItem => {
+                // Default: Kecil ke Balita otomatis tercentang sejak awal
+                if (!syncState[menuItem]) {
+                    syncState[menuItem] = { besarToKecil: false, besarToBumil: false, besarToBalita: false, kecilToBalita: true };
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'price-item';
+                
+                const rowMain = document.createElement('div');
+                rowMain.className = 'price-row';
+                
+                const label = document.createElement('span');
+                label.textContent = menuItem;
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.placeholder = 'Rp 0';
+                input.value = priceData[currentTab][menuItem] || '';
+                
+                if (currentTab === 'kecil' && syncState[menuItem].besarToKecil) {
+                    input.disabled = true;
+                    input.title = "Terkunci: Terhubung dengan Porsi Besar";
+                } else if (currentTab === 'bumil' && syncState[menuItem].besarToBumil) {
+                    input.disabled = true;
+                    input.title = "Terkunci: Terhubung dengan Porsi Besar";
+                } else if (currentTab === 'balita') {
+                    if (syncState[menuItem].kecilToBalita || syncState[menuItem].besarToBalita) {
+                        input.disabled = true;
+                        let source = syncState[menuItem].kecilToBalita ? 'Porsi Kecil' : 'Porsi Besar';
+                        input.title = `Terkunci: Terhubung dengan ${source}`;
+                    }
+                }
+
+                input.addEventListener('input', (e) => {
+                    let val = e.target.value;
+                    priceData[currentTab][menuItem] = val;
+                    
+                    if (currentTab === 'besar') {
+                        if (syncState[menuItem].besarToKecil) {
+                            priceData.kecil[menuItem] = val;
+                            if (syncState[menuItem].kecilToBalita) priceData.balita[menuItem] = val; 
+                        }
+                        if (syncState[menuItem].besarToBumil) priceData.bumil[menuItem] = val;
+                        if (syncState[menuItem].besarToBalita) priceData.balita[menuItem] = val;
+                    } else if (currentTab === 'kecil') {
+                        if (syncState[menuItem].kecilToBalita) priceData.balita[menuItem] = val;
+                    }
+                    
+                    updateTotalUI(); 
+                });
+
+                rowMain.appendChild(label);
+                rowMain.appendChild(input);
+                itemDiv.appendChild(rowMain);
+
+                if (currentTab === 'besar' || currentTab === 'kecil') {
+                    const syncRow = document.createElement('div');
+                    syncRow.className = 'sync-row';
+                    
+                    const spanTerapkan = document.createElement('span');
+                    spanTerapkan.style.color = "var(--primary)";
+                    spanTerapkan.style.fontWeight = "700";
+                    spanTerapkan.textContent = "↳ Terapkan ke:";
+                    syncRow.appendChild(spanTerapkan);
+                    
+                    let targets = [];
+                    if (currentTab === 'besar') {
+                        targets = [
+                            { key: 'kecil', stateKey: 'besarToKecil', label: 'Kecil' }, 
+                            { key: 'bumil', stateKey: 'besarToBumil', label: 'Bumil' }, 
+                            { key: 'balita', stateKey: 'besarToBalita', label: 'Balita' }
+                        ];
+                    } else if (currentTab === 'kecil') {
+                        targets = [
+                            { key: 'balita', stateKey: 'kecilToBalita', label: 'Balita' }
+                        ];
+                    }
+
+                    targets.forEach(t => {
+                        const lbl = document.createElement('label');
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = syncState[menuItem][t.stateKey];
+                        
+                        cb.addEventListener('change', (e) => {
+                            syncState[menuItem][t.stateKey] = e.target.checked;
+                            if (e.target.checked) {
+                                priceData[t.key][menuItem] = priceData[currentTab][menuItem] || '';
+                                if (currentTab === 'besar' && t.key === 'kecil' && syncState[menuItem].kecilToBalita) {
+                                    priceData.balita[menuItem] = priceData.besar[menuItem] || '';
+                                }
+                                showToast(`Terhubung dengan Porsi ${t.label}`, 'success');
+                                updateTotalUI();
+                            }
+                        });
+
+                        lbl.appendChild(cb);
+                        lbl.appendChild(document.createTextNode(t.label));
+                        syncRow.appendChild(lbl);
+                    });
+                    itemDiv.appendChild(syncRow);
+                }
+                
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // --- FITUR MENU POP (Kalkulasi Ketersediaan Menu) ---
+        function generateMenuPOP() {
+            let menuMap = {};
+            
+            // Label yang digunakan di dalam kurung jika menu hanya ada di porsi tertentu
+            const labelMap = {
+                'besar': 'Porsi Besar',
+                'kecil': 'Porsi Kecil',
+                'bumil': 'Bumil dan Busui',
+                'balita': 'Balita'
+            };
+
+            // Mengumpulkan semua menu dan mencatat di porsi mana saja dia berada
+            ['besar', 'kecil', 'bumil', 'balita'].forEach(key => {
+                if (parsedData[key] && parsedData[key].menu) {
+                    parsedData[key].menu.forEach(item => {
+                        if (!menuMap[item]) menuMap[item] = [];
+                        menuMap[item].push(labelMap[key]);
+                    });
+                }
+            });
+
+            let popItems = [];
+            Object.keys(menuMap).forEach(item => {
+                let pList = menuMap[item];
+                // Jika menu ada di keempat porsi, tidak perlu kurung
+                if (pList.length === 4) {
+                    popItems.push(item);
+                } else {
+                    // Jika kurang dari 4, buat teks gabungan menggunakan "&" atau ","
+                    let pString = pList.length === 2 ? pList.join(' & ') : pList.join(', ');
+                    popItems.push(`${item} (${pString})`);
+                }
+            });
+            
+            return `Menu POP : ${popItems.join(', ')}`;
+        }
+
+        // --- GENERATE TEMPLATE ---
+        function generateTemplate() {
+            if (!parsedData.besar || !parsedData.kecil || !parsedData.bumil || !parsedData.balita) {
+                showToast('Gagal! Impor (Ctrl+V) data Excel untuk keempat porsi terlebih dahulu.', 'error');
+                return;
+            }
+
+            const formatSection = (title, dataKey) => {
+                const data = parsedData[dataKey];
+                const totals = data.totals;
+                let menuStrings = data.menu.map(menuItem => `${menuItem} ${priceData[dataKey][menuItem] || '0'}`);
+
+                return `${title}\n` +
+                       `Energi: ${totals.energi} kkal\n` +
+                       `Protein: ${totals.protein} gr\n` +
+                       `Lemak: ${totals.lemak} gr\n` +
+                       `Karbohidrat: ${totals.karbohidrat} gr\n` +
+                       `Serat: ${totals.serat} gr\n\n` +
+                       `Menu: ${menuStrings.join(', ')}`;
+            };
+
+            // Sisipkan Menu POP di baris pertama
+            const popText = generateMenuPOP();
+
+            const outputText = popText + "\n--------\n\n" + [
+                formatSection('Porsi Besar', 'besar'),
+                formatSection('Porsi Kecil', 'kecil'),
+                formatSection('Porsi Bumil & Busui', 'bumil'),
+                formatSection('Porsi Balita', 'balita')
+            ].join('\n\n------------\n\n');
+
+            document.getElementById('output-area').value = outputText;
+            showToast('✨ Template Laporan berhasil dibuat!', 'success');
+        }
+
+        function copyToClipboard() {
+            const outputArea = document.getElementById('output-area');
+            if (!outputArea.value) {
+                showToast('Teks kosong. Klik "Buat Template Teks" dulu.', 'warning');
+                return;
+            }
+            outputArea.select();
+            document.execCommand('copy');
+            showToast('📋 Disalin ke Clipboard!', 'success');
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+</body>
+</html>
